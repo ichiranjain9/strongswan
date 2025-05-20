@@ -81,3 +81,17 @@ libstrongswan_tests_LDFLAGS = @COVERAGE_LDFLAGS@
 libstrongswan_tests_LDADD = \
   $(top_builddir)/src/libstrongswan/libstrongswan.la \
   libtest.la
+
+# CMocka based tests
+TESTS += test_aead
+check_PROGRAMS += test_aead
+
+test_aead_SOURCES = test_aead.c
+test_aead_CFLAGS = \
+  -I$(top_srcdir)/src/libstrongswan \
+  -include $(top_builddir)/config.h \
+  @COVERAGE_CFLAGS@
+test_aead_LDFLAGS = @COVERAGE_LDFLAGS@
+test_aead_LDADD = \
+  $(top_builddir)/src/libstrongswan/libstrongswan.la \
+  -lcmocka
