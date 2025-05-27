@@ -359,16 +359,23 @@ METHOD(vici_message_t, vget_int, int,
 		{
 			return def;
 		}
-		if (chunk_printable(value, NULL, 0))
-		{
-			snprintf(buf, sizeof(buf), "%.*s", (int)value.len, value.ptr);
-			errno = 0;
-			ret = strtol(buf, &pos, 0);
-			if (errno == 0 && pos == buf + strlen(buf))
-			{
-				return ret;
-			}
-		}
+                if (chunk_printable(value, NULL, 0))
+                {
+                        if (value.len < sizeof(buf))
+                        {
+                                snprintf(buf, sizeof(buf), "%.*s", (int)value.len, value.ptr);
+                                errno = 0;
+                                ret = strtol(buf, &pos, 0);
+                                if (errno == 0 && pos == buf + strlen(buf))
+                                {
+                                        return ret;
+                                }
+                        }
+                        else
+                        {
+                                errno = ERANGE;
+                        }
+                }
 	}
 	return def;
 }
@@ -399,11 +406,18 @@ METHOD(vici_message_t, vget_bool, bool,
 		{
 			return def;
 		}
-		if (chunk_printable(value, NULL, 0))
-		{
-			snprintf(buf, sizeof(buf), "%.*s", (int)value.len, value.ptr);
-			return settings_value_as_bool(buf, def);
-		}
+                if (chunk_printable(value, NULL, 0))
+                {
+                        if (value.len < sizeof(buf))
+                        {
+                                snprintf(buf, sizeof(buf), "%.*s", (int)value.len, value.ptr);
+                                return settings_value_as_bool(buf, def);
+                        }
+                        else
+                        {
+                                errno = ERANGE;
+                        }
+                }
 	}
 	return def;
 }
